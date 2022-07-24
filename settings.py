@@ -11,8 +11,11 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
 from pathlib import Path
+from django.db import connections
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from typing import List
+
 BASE_DIR = Path(__file__).resolve().parent
 
 
@@ -38,6 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.trees',
+    'apps.markers',
+    'django.contrib.gis',
+    "rest_framework",
+    "rest_framework_gis",
+    "leaflet",
 ]
 
 MIDDLEWARE = [
@@ -90,7 +98,19 @@ DATABASES = {
         'HOST': 'db',
         'PORT': '5432',
         'ATOMIC_REQUESTS': True
-    }
+    },
+    'markers_db': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'gis',
+        'USER': 'docker',
+        'PASSWORD': 'docker',
+        'HOST': 'dbgis',
+        'PORT': '25432',
+    },
+    # 'markers_db': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
 }
 
 
@@ -147,3 +167,10 @@ STATICFILES_FINDERS = [
 ]
 
 SITE_URL = os.getenv('SITE_URL', '')
+
+DATABASE_ROUTERS = ['routers.db_routers.DefaultRouter', 'routers.db_routers.MarkersRouter',]
+
+# LEAFLET_CONFIG = {
+#     'DEFAULT_CENTER': (58.47, 70.23),
+#     'DEFAULT_ZOOM': 5,
+# }

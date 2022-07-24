@@ -20,12 +20,26 @@ services:
       - media:/media
     depends_on:
       - db
+      - dbgis
     env_file:
       - .env
     environment:
         PY_AUTORELOAD: 1
-    command: /bin/bash -c 'pip install -r requirements.txt && ./manage.py runserver 0.0.0.0:8000'
-
+    command: /bin/bash -c 'pip install -r requirements.txt && apt update && apt-get -y install gdal-bin libpq-dev && ./manage.py runserver 0.0.0.0:8000'
+  dbgis:
+    image: postgis/postgis:14-3.2 #postgis/postgis:14-3.2 kartoza/postgis:14-3.3
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=gis
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - PGPORT=25432
+      - PGDATAGIS=/var/lib/postgresqlgis/pgdatagis/
+    volumes:
+      - pgdatagis:/var/lib/postgresqlgis/pgdatagis/
+    ports:
+      - "25432:25432"
   nginx:
     image: nginx
     volumes:
@@ -39,5 +53,6 @@ services:
 
 volumes:
   pgdata: { }
+  pgdatagis: { }
   static: { }
   media: { }
